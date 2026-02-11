@@ -1,0 +1,29 @@
+# Target Audience Configuration
+# This file defines the targeting parameters for lead generation
+# Platforms: LinkedIn and X (focused on B2B outreach)
+
+industries:
+  - AI
+  - Web3
+  - blockchain
+  - tech startups
+
+roles:
+  - Founders
+  - CEOs
+  - Co-founders
+  - BD heads
+  - Product Owners
+  - Growth Leads
+
+regions:
+  - Germany
+  - broader EU
+  - other European countries
+  - South Asia
+  - Southeast Asia
+  - China
+
+platforms:
+  - LinkedIn
+  - X
