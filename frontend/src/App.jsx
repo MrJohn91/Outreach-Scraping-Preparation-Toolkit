@@ -54,6 +54,7 @@ function App() {
   const handleSearch = async (searchParams) => {
     setLoading(true)
     try {
+      // Start scraping job
       const response = await fetch('/scrape', {
         method: 'POST',
         headers: {
@@ -64,10 +65,13 @@ function App() {
 
       const data = await response.json()
 
-      if (data.status === 'success') {
+      if (data.status === 'started' && data.job_id) {
+        // Poll for results
+        await pollForResults(data.job_id)
+      } else if (data.status === 'success') {
+        // Backward compatibility - direct results
         setResults(data.results || [])
         setView('search')
-        // Reload history after search
         await loadHistory()
       } else {
         alert('Search failed: ' + (data.detail || 'Unknown error'))
@@ -78,6 +82,40 @@ function App() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const pollForResults = async (jobId) => {
+    const maxAttempts = 60 // 60 seconds max
+    let attempts = 0
+
+    const poll = async () => {
+      try {
+        const response = await fetch(`/scrape-status/${jobId}`)
+        const data = await response.json()
+
+        if (data.status === 'completed') {
+          setResults(data.results || [])
+          setView('search')
+          await loadHistory()
+          setLoading(false)
+        } else if (data.status === 'failed') {
+          alert('Search failed: ' + (data.error || 'Unknown error'))
+          setLoading(false)
+        } else if (attempts < maxAttempts) {
+          attempts++
+          setTimeout(poll, 1000) // Poll every second
+        } else {
+          alert('Search timed out. Please try again.')
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Polling failed:', error)
+        alert('Failed to get results: ' + error.message)
+        setLoading(false)
+      }
+    }
+
+    poll()
   }
 
   const handleSelectLead = (lead) => {
