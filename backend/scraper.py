@@ -97,7 +97,13 @@ def scrape_linkedin(keyword: str, location: str, max_results: int) -> List[Dict]
         "findContacts": False,   # Don't search for emails (costs extra)
     }
 
-    run = client.actor(ACTORS["linkedin"]).call(run_input=run_input)
+    try:
+        print(f"   Calling Apify actor: {ACTORS['linkedin']}")
+        run = client.actor(ACTORS["linkedin"]).call(run_input=run_input)
+        print(f"   Actor run completed: {run.get('id', 'unknown')}")
+    except Exception as e:
+        print(f"   ❌ Apify actor call failed: {type(e).__name__}: {e}")
+        raise
 
     results = []
     count = 0
