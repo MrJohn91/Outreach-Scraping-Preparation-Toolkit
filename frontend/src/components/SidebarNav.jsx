@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Search, History, Star, DollarSign, ChevronDown, ChevronRight } from 'lucide-react'
+import { Search, History, Star, ChevronDown, ChevronRight } from 'lucide-react'
 
 function SidebarNav({ view, setView, history, savedLeads, onHistoryClick, onLeadClick }) {
   const [historyExpanded, setHistoryExpanded] = useState(true)
@@ -110,21 +110,6 @@ function SidebarNav({ view, setView, history, savedLeads, onHistoryClick, onLead
               ))}
             </div>
           )}
-        </div>
-
-        {/* Cost Insights Section */}
-        <div>
-          <button
-            onClick={() => setView('cost')}
-            className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition ${
-              view === 'cost'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-            }`}
-          >
-            <DollarSign size={20} />
-            <span className="font-medium">Cost Insights</span>
-          </button>
         </div>
       </nav>
 

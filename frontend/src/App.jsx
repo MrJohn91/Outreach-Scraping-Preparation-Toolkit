@@ -3,8 +3,6 @@ import SidebarNav from './components/SidebarNav'
 import SearchForm from './components/SearchForm'
 import ResultsTable from './components/ResultsTable'
 import DetailSidebar from './components/DetailSidebar'
-import CostPage from './pages/CostPage'
-import { apiUrl } from './config'
 
 function App() {
   // State management
@@ -14,7 +12,7 @@ function App() {
   const [savedLeads, setSavedLeads] = useState([])
   const [loading, setLoading] = useState(false)
   const [audienceConfig, setAudienceConfig] = useState(null)
-  const [view, setView] = useState('search') // 'search', 'history', 'leads', 'cost'
+  const [view, setView] = useState('search') // 'search', 'history', 'leads'
 
   // Load initial data
   useEffect(() => {
@@ -25,7 +23,7 @@ function App() {
 
   const loadAudienceConfig = async () => {
     try {
-      const response = await fetch(apiUrl('/api/config/audience')
+      const response = await fetch('/api/config/audience')
       const data = await response.json()
       setAudienceConfig(data.data)
     } catch (error) {
@@ -35,7 +33,7 @@ function App() {
 
   const loadHistory = async () => {
     try {
-      const response = await fetch(apiUrl('/history')
+      const response = await fetch('/history')
       const data = await response.json()
       setHistory(data.history || [])
     } catch (error) {
@@ -45,7 +43,7 @@ function App() {
 
   const loadSavedLeads = async () => {
     try {
-      const response = await fetch(apiUrl('/leads')
+      const response = await fetch('/leads')
       const data = await response.json()
       setSavedLeads(data.leads || [])
     } catch (error) {
@@ -56,7 +54,7 @@ function App() {
   const handleSearch = async (searchParams) => {
     setLoading(true)
     try {
-      const response = await fetch(apiUrl('/scrape', {
+      const response = await fetch('/scrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +86,7 @@ function App() {
 
   const handleSaveLead = async (lead) => {
     try {
-      const response = await fetch(apiUrl('/leads', {
+      const response = await fetch('/leads', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -143,7 +141,7 @@ function App() {
         max_results: historyItem.max_results || historyItem.params?.max_results || 20
       }
 
-      const response = await fetch(apiUrl('/scrape', {
+      const response = await fetch('/scrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,7 +168,7 @@ function App() {
 
   const handleDownloadCSV = async () => {
     try {
-      const response = await fetch(apiUrl('/download-csv')
+      const response = await fetch('/download-csv')
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -295,10 +293,6 @@ function App() {
                 </div>
               )}
             </div>
-          )}
-
-          {view === 'cost' && (
-            <CostPage />
           )}
         </div>
       </div>
