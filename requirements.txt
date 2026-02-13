@@ -3,4 +3,3 @@ uvicorn
 apify-client
 python-dotenv
 pyyaml
-mangum
