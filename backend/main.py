@@ -78,7 +78,7 @@ class LeadRequest(BaseModel):
 
 
 # Health Check Endpoint
-@app.get("/")
+@app.get("/api/health")
 async def health_check():
     """Health check endpoint."""
     return {
