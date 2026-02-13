@@ -15,15 +15,12 @@ from dotenv import load_dotenv
 import io
 import csv
 import re
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
 
 # Add backend directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
 from scraper import scrape_leads
 import database as db
-import jobs
 # Load environment variables from project root (parent of backend/)
 _env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(_env_path)
@@ -109,15 +106,12 @@ async def get_audience_config():
         raise HTTPException(status_code=500, detail=f"Error loading configuration: {str(e)}")
 
 
-# Thread pool for background tasks
-executor = ThreadPoolExecutor(max_workers=3)
-
-# Scraping Endpoint (Async)
+# Scraping Endpoint (Synchronous - waits for results)
 @app.post("/scrape")
 async def scrape(request: ScrapeRequest):
     """
-    Start async scraping job. Returns job ID immediately.
-    Poll /scrape-status/{job_id} for results.
+    Scrape leads using Apify scrapers.
+    Waits for results (may take 30-60 seconds).
     """
     try:
         # Build location
@@ -127,81 +121,34 @@ async def scrape(request: ScrapeRequest):
         if not request.keyword:
             raise HTTPException(status_code=400, detail="Keyword is required")
 
-        # Create job
-        job_id = jobs.create_job({
-            "keyword": request.keyword,
-            "location": location,
-            "platform": request.platform,
-            "max_results": request.max_results
-        })
-
-        # Start scraping in background
-        asyncio.create_task(run_scrape_job(job_id, request.keyword, location, request.platform, request.max_results))
-
-        return {
-            "status": "started",
-            "job_id": job_id,
-            "message": "Scraping started. Poll /scrape-status/{job_id} for results."
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to start scraping: {str(e)}")
-
-
-async def run_scrape_job(job_id: str, keyword: str, location: str, platform: str, max_results: int):
-    """Run scraping job in background."""
-    try:
-        jobs.start_job(job_id)
-        
-        # Run scraper in thread pool (blocking operation)
-        loop = asyncio.get_event_loop()
-        results = await loop.run_in_executor(
-            executor,
-            scrape_leads,
-            keyword,
-            location,
-            platform,
-            max_results
+        # Run scraper synchronously
+        results = scrape_leads(
+            keyword=request.keyword,
+            location=location,
+            platform=request.platform,
+            max_results=request.max_results
         )
 
         # Store results
         db.set_current_results(results)
         db.add_history({
-            "keyword": keyword,
+            "keyword": request.keyword,
             "location": location,
-            "platform": platform,
-            "max_results": max_results,
+            "platform": request.platform,
+            "max_results": request.max_results,
             "result_count": len(results)
         })
 
-        jobs.complete_job(job_id, results)
+        return {
+            "status": "success",
+            "message": f"Found {len(results)} results from {request.platform}",
+            "count": len(results),
+            "platform": request.platform,
+            "results": results
+        }
 
     except Exception as e:
-        jobs.fail_job(job_id, str(e))
-
-
-@app.get("/scrape-status/{job_id}")
-async def get_scrape_status(job_id: str):
-    """Get status of scraping job."""
-    job = jobs.get_job(job_id)
-    
-    if not job:
-        raise HTTPException(status_code=404, detail="Job not found")
-    
-    response = {
-        "job_id": job["id"],
-        "status": job["status"],
-        "created_at": job["created_at"],
-        "updated_at": job["updated_at"]
-    }
-    
-    if job["status"] == "completed":
-        response["results"] = job["results"]
-        response["count"] = len(job["results"])
-    elif job["status"] == "failed":
-        response["error"] = job["error"]
-    
-    return response
+        raise HTTPException(status_code=500, detail=f"Scraping failed: {str(e)}")
 
 
 # Results Endpoint
