@@ -35,6 +35,12 @@ else:
 _apify_token = os.getenv("APIFY_API_TOKEN")
 print(f"🔑 APIFY_API_TOKEN: {'SET' if _apify_token else 'NOT SET'}")
 
+# Debug: List all env vars that might be relevant
+print("🔍 Available env vars containing 'API' or 'KEY':")
+for key in os.environ:
+    if 'API' in key.upper() or 'KEY' in key.upper() or 'TOKEN' in key.upper():
+        print(f"   {key}: {'*' * min(len(os.environ[key]), 8)}")
+
 # Initialize FastAPI app
 app = FastAPI(
     title="Outreach Scraping Toolkit API",
