@@ -23,8 +23,17 @@ sys.path.insert(0, str(Path(__file__).parent))
 from scraper import scrape_leads
 import database as db
 # Load environment variables from project root (parent of backend/)
+# Use override=False to NOT overwrite Railway/system env vars
 _env_path = Path(__file__).resolve().parent.parent / ".env"
-load_dotenv(_env_path)
+if _env_path.exists():
+    print(f"📁 Loading .env from: {_env_path}")
+    load_dotenv(_env_path, override=False)
+else:
+    print(f"📁 No .env file found at {_env_path}, using system env vars")
+
+# Debug: Check if API token is available
+_apify_token = os.getenv("APIFY_API_TOKEN")
+print(f"🔑 APIFY_API_TOKEN: {'SET' if _apify_token else 'NOT SET'}")
 
 # Initialize FastAPI app
 app = FastAPI(
