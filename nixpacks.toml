@@ -9,7 +9,9 @@ cmds = [
 
 [phases.build]
 cmds = [
-    "cd frontend && npm run build"
+    "cd frontend && npm run build",
+    "echo \"APIFY_API_TOKEN=${APIFY_API_TOKEN}\" > .env",
+    "echo \"EXA_API_KEY=${EXA_API_KEY}\" >> .env"
 ]
 
 [start]
