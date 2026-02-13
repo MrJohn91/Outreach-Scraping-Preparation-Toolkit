@@ -4,6 +4,7 @@ import SearchForm from './components/SearchForm'
 import ResultsTable from './components/ResultsTable'
 import DetailSidebar from './components/DetailSidebar'
 import CostPage from './pages/CostPage'
+import { apiUrl } from './config'
 
 function App() {
   // State management
@@ -24,7 +25,7 @@ function App() {
 
   const loadAudienceConfig = async () => {
     try {
-      const response = await fetch('/api/config/audience')
+      const response = await fetch(apiUrl('/api/config/audience')
       const data = await response.json()
       setAudienceConfig(data.data)
     } catch (error) {
@@ -34,7 +35,7 @@ function App() {
 
   const loadHistory = async () => {
     try {
-      const response = await fetch('/history')
+      const response = await fetch(apiUrl('/history')
       const data = await response.json()
       setHistory(data.history || [])
     } catch (error) {
@@ -44,7 +45,7 @@ function App() {
 
   const loadSavedLeads = async () => {
     try {
-      const response = await fetch('/leads')
+      const response = await fetch(apiUrl('/leads')
       const data = await response.json()
       setSavedLeads(data.leads || [])
     } catch (error) {
@@ -55,7 +56,7 @@ function App() {
   const handleSearch = async (searchParams) => {
     setLoading(true)
     try {
-      const response = await fetch('/scrape', {
+      const response = await fetch(apiUrl('/scrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +88,7 @@ function App() {
 
   const handleSaveLead = async (lead) => {
     try {
-      const response = await fetch('/leads', {
+      const response = await fetch(apiUrl('/leads', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ function App() {
         max_results: historyItem.max_results || historyItem.params?.max_results || 20
       }
 
-      const response = await fetch('/scrape', {
+      const response = await fetch(apiUrl('/scrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +170,7 @@ function App() {
 
   const handleDownloadCSV = async () => {
     try {
-      const response = await fetch('/download-csv')
+      const response = await fetch(apiUrl('/download-csv')
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')

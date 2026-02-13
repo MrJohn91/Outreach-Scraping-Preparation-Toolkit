@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { DollarSign, TrendingUp, AlertCircle, Info } from 'lucide-react'
+import { apiUrl } from '../config'
 
 function CostPage() {
   const [costData, setCostData] = useState(null)
@@ -12,7 +13,7 @@ function CostPage() {
 
   const loadCostAnalysis = async () => {
     try {
-      const response = await fetch('/api/cost-analysis')
+      const response = await fetch(apiUrl('/api/cost-analysis'))
       const data = await response.json()
 
       if (data.status === 'success') {
