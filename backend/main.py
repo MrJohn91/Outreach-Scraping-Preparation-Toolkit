@@ -5,6 +5,7 @@ Provides REST API endpoints for lead generation and management.
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Dict, Optional
 import yaml
@@ -425,3 +426,11 @@ async def startup_event():
     """Initialize database on startup."""
     db.initialize()
     print("✅ Database initialized")
+
+
+# Mount static files (frontend) - must be last
+FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="static")
+    print(f"✅ Serving frontend from {FRONTEND_DIST}")
+

@@ -11,10 +11,9 @@ from apify_client import ApifyClient
 
 # Platform-specific Apify Actor IDs
 ACTORS = {
-    "linkedin": "supreme_coder/linkedin-profile-scraper",  # Supports search URLs, returns people profiles
+    "linkedin": "fantastic-jobs/exa-ai-people-search",  # Exa.ai powered people search
     "x": "kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest",
     "twitter": "kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest",
-    "tiktok": "clockworks/tiktok-scraper",
 }
 
 

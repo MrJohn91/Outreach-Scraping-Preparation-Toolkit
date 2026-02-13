@@ -2,27 +2,25 @@
 
 Lead generation toolkit for LinkedIn and X (Twitter) with Exa.ai-powered search.
 
-## Deploy to Vercel
+## Deploy to Railway
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/MrJohn91/Outreach-Scraping-Preparation-Toolkit)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/outreach-toolkit)
 
 ### Deployment Steps
 
-1. **Click "Deploy with Vercel"** or:
-   - Go to https://vercel.com
-   - Click "Add New Project"
-   - Import: `MrJohn91/Outreach-Scraping-Preparation-Toolkit`
+1. **Go to Railway:**
+   - Visit https://railway.app
+   - Click "New Project"
+   - Select "Deploy from GitHub repo"
+   - Choose: `MrJohn91/Outreach-Scraping-Preparation-Toolkit`
 
 2. **Set Environment Variables:**
-   - `APIFY_API_TOKEN` - Get from https://console.apify.com/account/integrations
-   - `EXA_API_KEY` - Get from https://exa.ai
+   - `APIFY_API_TOKEN` = your Apify token
+   - `EXA_API_KEY` = your Exa.ai key
 
-3. **Deploy** - Vercel will automatically:
-   - Build the frontend
-   - Deploy the FastAPI backend as serverless functions
-   - Configure routing
+3. **Deploy** - Railway will automatically build and deploy
 
-4. **Access your app** at `https://your-project.vercel.app`
+4. **Access your app** at the Railway-provided URL
 
 ## Features
 
