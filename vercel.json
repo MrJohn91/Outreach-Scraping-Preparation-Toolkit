@@ -7,7 +7,7 @@
       "dest": "/api/index.py"
     },
     {
-      "src": "/(scrape|history|leads|results|download-csv)",
+      "src": "/(scrape|scrape-status|history|leads|results|download-csv)(.*)",
       "dest": "/api/index.py"
     },
     {
