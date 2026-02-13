@@ -2,19 +2,27 @@
 
 Lead generation toolkit for LinkedIn and X (Twitter) with Exa.ai-powered search.
 
-## Quick Start on Replit
+## Deploy to Vercel
 
-1. **Set Environment Variables** in Replit Secrets:
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/MrJohn91/Outreach-Scraping-Preparation-Toolkit)
+
+### Deployment Steps
+
+1. **Click "Deploy with Vercel"** or:
+   - Go to https://vercel.com
+   - Click "Add New Project"
+   - Import: `MrJohn91/Outreach-Scraping-Preparation-Toolkit`
+
+2. **Set Environment Variables:**
    - `APIFY_API_TOKEN` - Get from https://console.apify.com/account/integrations
    - `EXA_API_KEY` - Get from https://exa.ai
 
-2. **Click Run** - The app will automatically:
-   - Install dependencies
-   - Build frontend
-   - Start backend (port 8000)
-   - Start frontend (port 5173)
+3. **Deploy** - Vercel will automatically:
+   - Build the frontend
+   - Deploy the FastAPI backend as serverless functions
+   - Configure routing
 
-3. **Access the app** via the Replit webview
+4. **Access your app** at `https://your-project.vercel.app`
 
 ## Features
 

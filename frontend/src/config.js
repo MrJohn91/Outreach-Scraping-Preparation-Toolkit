@@ -1,6 +1,6 @@
 // API configuration for dev and production
 const API_BASE_URL = import.meta.env.PROD 
-  ? 'http://0.0.0.0:8000'  // Production (Replit)
+  ? ''  // Production (Vercel) - uses same domain
   : '';  // Development (uses Vite proxy)
 
 export const apiUrl = (path) => {
