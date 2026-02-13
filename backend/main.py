@@ -426,6 +426,14 @@ async def startup_event():
     """Initialize database on startup."""
     db.initialize()
     print("✅ Database initialized")
+    
+    # Check if frontend exists
+    FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+    if FRONTEND_DIST.exists():
+        print(f"✅ Frontend dist found at {FRONTEND_DIST}")
+        print(f"   Files: {list(FRONTEND_DIST.glob('*'))}")
+    else:
+        print(f"⚠️  Frontend dist NOT found at {FRONTEND_DIST}")
 
 
 # Mount static files (frontend) - must be last
@@ -433,4 +441,6 @@ FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
 if FRONTEND_DIST.exists():
     app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="static")
     print(f"✅ Serving frontend from {FRONTEND_DIST}")
+else:
+    print(f"⚠️  Cannot serve frontend - directory not found: {FRONTEND_DIST}")
 
