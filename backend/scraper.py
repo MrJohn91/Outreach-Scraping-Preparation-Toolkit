@@ -90,11 +90,17 @@ def scrape_linkedin(keyword: str, location: str, max_results: int) -> List[Dict]
 
     print(f"   Search URL: {search_url}")
 
+    # Get EXA API key for the actor
+    exa_api_key = os.getenv("EXA_API_KEY")
+    if not exa_api_key:
+        raise ValueError("EXA_API_KEY environment variable is required for LinkedIn search")
+
     # Build input for the scraper - it accepts URLs (profile URLs or search URLs)
     run_input = {
         "urls": [{"url": search_url}],
         "scrapeCompany": False,  # Don't scrape company pages
         "findContacts": False,   # Don't search for emails (costs extra)
+        "exaApiKey": exa_api_key,  # Required by the Exa-powered actor
     }
 
     try:
