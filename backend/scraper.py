@@ -115,7 +115,14 @@ def scrape_linkedin(keyword: str, location: str, max_results: int) -> List[Dict]
 
     results = []
     count = 0
+    raw_count = 0
     for item in client.dataset(run["defaultDatasetId"]).iterate_items():
+        raw_count += 1
+        # Debug: print first 3 raw items to see the structure
+        if raw_count <= 3:
+            print(f"   DEBUG raw item {raw_count}: {list(item.keys())}")
+            print(f"   DEBUG sample values: {dict(list(item.items())[:5])}")
+
         if count >= max_results:
             break
 
