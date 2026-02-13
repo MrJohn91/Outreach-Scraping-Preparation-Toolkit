@@ -1,5 +1,6 @@
-fastapi
-uvicorn
-apify-client
-python-dotenv
-pyyaml
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+apify-client==1.7.1
+python-dotenv==1.0.0
+pyyaml==6.0.1
