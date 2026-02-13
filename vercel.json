@@ -26,9 +26,5 @@
       "src": "/(.*)",
       "dest": "frontend/dist/$1"
     }
-  ],
-  "env": {
-    "APIFY_API_TOKEN": "@apify_api_token",
-    "EXA_API_KEY": "@exa_api_key"
-  }
+  ]
 }
