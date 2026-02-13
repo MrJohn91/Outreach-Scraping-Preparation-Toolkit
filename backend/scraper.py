@@ -126,67 +126,55 @@ def scrape_linkedin(keyword: str, location: str, max_results: int) -> List[Dict]
         if count >= max_results:
             break
 
-        # Extract person's name
-        first_name = item.get("firstName", "")
-        last_name = item.get("lastName", "")
-        full_name = f"{first_name} {last_name}".strip() or item.get("fullName", item.get("name", "Unknown"))
+        # Extract person's name from 'author' field (Exa format)
+        full_name = item.get("author", item.get("name", "")).strip()
 
-        # Skip if no name (might be an error or company)
-        if full_name == "Unknown" or not full_name.strip():
+        # Skip if no name
+        if not full_name or full_name == "Unknown":
             print(f"   Skipping: No name found")
             continue
 
-        # Get headline and bio for organization check
-        headline = item.get("headline", "")
-        bio = item.get("about", item.get("summary", ""))
+        # Extract headline from title (format: "Name | Headline")
+        title = item.get("title", "")
+        headline = ""
+        if "|" in title:
+            headline = title.split("|", 1)[1].strip()
+
+        # Get bio from text field
+        bio = item.get("text", "")
 
         # Skip if this looks like an organization
         if is_organization(full_name, bio, headline):
             print(f"   Skipping organization: {full_name}")
             continue
 
-        # Skip if no firstName AND no lastName (likely a company page)
-        if not first_name and not last_name:
-            print(f"   Skipping (no first/last name): {full_name}")
-            continue
-
-        # Extract current job info
+        # Extract company from bio text (look for "at [Company]" pattern)
         current_company = ""
-        current_title = ""
+        current_title = headline
 
-        # Try currentCompany field first
-        current_company_data = item.get("currentCompany", {})
-        if isinstance(current_company_data, dict):
-            current_company = current_company_data.get("name", "")
-            current_title = current_company_data.get("title", "")
-
-        # Try positions/experience array as fallback
-        if not current_title:
-            positions = item.get("positions", item.get("experience", []))
-            if positions and len(positions) > 0:
-                current_pos = positions[0]
-                if isinstance(current_pos, dict):
-                    current_company = current_company or current_pos.get("companyName", current_pos.get("company", ""))
-                    current_title = current_pos.get("title", current_pos.get("position", ""))
+        # Try to extract location from text
+        region = location
+        if "Germany" in bio:
+            region = "Germany"
+        if "Berlin" in bio:
+            region = "Berlin, Germany"
 
         # Get profile URL
-        profile_url = item.get("profileUrl", item.get("linkedinUrl", item.get("url", "")))
-        if not profile_url and item.get("publicIdentifier"):
-            profile_url = f"https://www.linkedin.com/in/{item.get('publicIdentifier')}/"
+        profile_url = item.get("url", "")
 
         results.append({
             "id": f"li_{uuid.uuid4().hex[:8]}",
             "name": full_name,
-            "role": current_title or headline,
+            "role": current_title,
             "company": current_company,
             "platform": "LinkedIn",
             "contact_link": profile_url,
-            "region": item.get("location", item.get("geoLocation", item.get("country", location))),
+            "region": region,
             "notes": keyword,
-            "followers": item.get("followersCount", item.get("connections", 0)),
-            "industry": item.get("industry", ""),
+            "followers": 0,
+            "industry": "",
             "headline": headline,
-            "bio": bio,
+            "bio": bio[:500] if bio else "",  # Truncate long bios
         })
         count += 1
         print(f"   ✓ Added person: {full_name}")
