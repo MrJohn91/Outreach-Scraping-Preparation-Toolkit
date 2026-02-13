@@ -1,7 +1,7 @@
-wh"""
+"""
 Apify integration module for multi-platform lead scraping.
-Supports: LinkedIn, X (Twitter), TikTok
-Requires APIFY_API_TOKEN to be set.
+Supports: LinkedIn (via Exa.ai), X (Twitter)
+Requires APIFY_API_TOKEN and EXA_API_KEY to be set.
 """
 import os
 import uuid
