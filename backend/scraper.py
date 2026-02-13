@@ -28,17 +28,13 @@ def get_client() -> ApifyClient:
 def is_organization(name: str, bio: str, headline: str) -> bool:
     """Check if a result looks like an organization/company rather than a person."""
     name_lower = name.lower()
-    bio_lower = (bio or "").lower()
-    headline_lower = (headline or "").lower()
 
-    # Organization indicators in name
+    # Only check name for clear organization indicators
+    # These are words that are very unlikely to appear in a person's actual name
     org_name_indicators = [
-        "inc", "ltd", "llc", "corp", "company", "group", "agency", "council",
-        "forum", "village", "capital", "ventures", "partners", "fund", "labs",
-        "studio", "studios", "network", "community", "foundation", "institute",
-        "association", "society", "academy", "school", "university", "college",
-        "club", "hub", "factory", "workshop", "meetup", "show", "conference",
-        "summit", "event", "media", "news", "magazine", "podcast", "tv", "radio"
+        " inc", " ltd", " llc", " corp", " gmbh", " ag",
+        "company", "group", "agency", "network", "foundation",
+        "institute", "association", "university", "college"
     ]
 
     # Check if name contains organization indicators
@@ -46,24 +42,11 @@ def is_organization(name: str, bio: str, headline: str) -> bool:
         if indicator in name_lower:
             return True
 
-    # Organization indicators in bio
-    org_bio_indicators = [
-        "is a company", "is an organization", "is a community", "is a group",
-        "is a platform", "is a network", "we are", "our mission", "our team",
-        "our company", "our organization", "founded in", "established in",
-        "headquartered", "offices in", "employees worldwide"
-    ]
-
-    for indicator in org_bio_indicators:
-        if indicator in bio_lower:
-            return True
-
-    # Check if name has no space (likely a brand name, not a person)
-    # But allow single-word first names with last names
+    # Check if name has no space (single word - likely a brand)
     words = name.split()
     if len(words) == 1 and len(name) > 3:
-        # Single word names that look like brands
-        if any(c.isupper() for c in name[1:]):  # CamelCase = brand
+        # Single word names that look like brands (CamelCase)
+        if any(c.isupper() for c in name[1:]):
             return True
 
     return False
@@ -162,22 +145,25 @@ def scrape_linkedin(keyword: str, location: str, max_results: int) -> List[Dict]
         # Get profile URL
         profile_url = item.get("url", "")
 
-        results.append({
-            "id": f"li_{uuid.uuid4().hex[:8]}",
-            "name": full_name,
-            "role": current_title,
-            "company": current_company,
-            "platform": "LinkedIn",
-            "contact_link": profile_url,
-            "region": region,
-            "notes": keyword,
-            "followers": 0,
-            "industry": "",
-            "headline": headline,
-            "bio": bio[:500] if bio else "",  # Truncate long bios
-        })
-        count += 1
-        print(f"   ✓ Added person: {full_name}")
+        try:
+            results.append({
+                "id": f"li_{uuid.uuid4().hex[:8]}",
+                "name": full_name,
+                "role": current_title or "",
+                "company": current_company or "",
+                "platform": "LinkedIn",
+                "contact_link": profile_url or "",
+                "region": region or "",
+                "notes": keyword or "",
+                "followers": 0,
+                "industry": "",
+                "headline": headline or "",
+                "bio": (bio[:500] if bio else ""),
+            })
+            count += 1
+            print(f"   ✓ Added person: {full_name}")
+        except Exception as e:
+            print(f"   ❌ Error adding {full_name}: {e}")
 
     print(f"✅ LinkedIn people search completed: {len(results)} results (filtered from raw data)")
     return results
