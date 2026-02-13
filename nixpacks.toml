@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python312", "nodejs_20", "npm"]
+nixPkgs = ["python3", "nodejs"]
 
 [phases.install]
 cmds = [
@@ -9,8 +9,7 @@ cmds = [
 
 [phases.build]
 cmds = [
-    "cd frontend && npm run build",
-    "echo 'Frontend built successfully'"
+    "cd frontend && npm run build"
 ]
 
 [start]
