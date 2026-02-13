@@ -7,8 +7,8 @@ from datetime import datetime
 from typing import List, Dict, Optional
 from pathlib import Path
 
-# Data directory
-DATA_DIR = Path(__file__).parent.parent / "data"
+# Use /tmp for Vercel serverless (read-only filesystem)
+DATA_DIR = Path("/tmp/data") if os.environ.get("VERCEL") else Path(__file__).parent.parent / "data"
 HISTORY_FILE = DATA_DIR / "history.json"
 LEADS_FILE = DATA_DIR / "leads.json"
 
@@ -20,7 +20,11 @@ _current_results: List[Dict] = []
 
 def _ensure_data_dir():
     """Create data directory if it doesn't exist."""
-    DATA_DIR.mkdir(exist_ok=True)
+    try:
+        DATA_DIR.mkdir(exist_ok=True, parents=True)
+    except OSError:
+        # If we can't create directory, use in-memory only
+        pass
 
 
 def _load_json_file(file_path: Path) -> List[Dict]:
