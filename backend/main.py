@@ -64,7 +64,9 @@ CONFIG_PATH = Path(__file__).parent.parent / "config" / "audience.yaml"
 # Pydantic Models
 class ScrapeRequest(BaseModel):
     keyword: str
-    location: str = ""  # Combined location field
+    location: str = ""  # Location/region filter
+    position: str = ""  # Job title filter (e.g., "CEO", "Founder")
+    company: str = ""   # Company name filter
     city: str = ""      # Legacy field for backward compatibility
     state: str = ""     # Legacy field for backward compatibility
     platform: str = "linkedin"  # linkedin, x
@@ -142,7 +144,9 @@ async def scrape(request: ScrapeRequest):
             keyword=request.keyword,
             location=location,
             platform=request.platform,
-            max_results=request.max_results
+            max_results=request.max_results,
+            position=request.position,
+            company=request.company
         )
 
         # Store results

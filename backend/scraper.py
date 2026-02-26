@@ -52,34 +52,44 @@ def is_organization(name: str, bio: str, headline: str) -> bool:
     return False
 
 
-def scrape_linkedin(keyword: str, location: str, max_results: int) -> List[Dict]:
-    """Scrape LinkedIn PEOPLE profiles using Apify (supreme_coder/linkedin-profile-scraper).
+def scrape_linkedin(keyword: str, location: str, max_results: int, position: str = "", company: str = "") -> List[Dict]:
+    """Scrape LinkedIn PEOPLE profiles using Apify + Exa.ai.
 
-    This actor accepts LinkedIn search URLs and returns actual people profiles.
+    Args:
+        keyword: Main search term (e.g., "AI", "startup")
+        location: Location filter (e.g., "Berlin", "Germany")
+        max_results: Maximum number of results
+        position: Job title filter (e.g., "CEO", "Founder")
+        company: Company name filter
     """
-    print(f"🔗 Starting LinkedIn people search: {keyword} in {location}")
+    print(f"🔗 Starting LinkedIn people search:")
+    print(f"   Keyword: {keyword}")
+    print(f"   Location: {location}")
+    print(f"   Position: {position}")
+    print(f"   Company: {company}")
+
     client = get_client()
-
-    # Build LinkedIn people search URL
-    # Format: https://www.linkedin.com/search/results/people/?keywords=AI%20founder&origin=GLOBAL_SEARCH_HEADER
-    from urllib.parse import quote
-
-    search_query = keyword
-    if location:
-        search_query = f"{keyword} {location}"
-
-    encoded_query = quote(search_query)
-    search_url = f"https://www.linkedin.com/search/results/people/?keywords={encoded_query}&origin=GLOBAL_SEARCH_HEADER"
-
-    print(f"   Search URL: {search_url}")
 
     # Get EXA API key for the actor
     exa_api_key = os.getenv("EXA_API_KEY")
     if not exa_api_key:
         raise ValueError("EXA_API_KEY environment variable is required for LinkedIn search")
 
-    # Build search query
-    query = f"{keyword} {location}".strip() if location else keyword
+    # Build search query with all filters
+    # IMPORTANT: Add site:linkedin.com/in/ to ensure ONLY LinkedIn profile results
+    query_parts = ["site:linkedin.com/in/"]
+
+    if keyword:
+        query_parts.append(keyword)
+    if position:
+        query_parts.append(f'"{position}"')  # Exact match for position
+    if company:
+        query_parts.append(f'"{company}"')   # Exact match for company
+    if location:
+        query_parts.append(location)
+
+    query = " ".join(query_parts)
+    print(f"   Final query: {query}")
 
     # Build input for the Exa-powered people search actor
     run_input = {
@@ -279,7 +289,9 @@ def scrape_leads(
     keyword: str,
     location: str,
     platform: str = "linkedin",
-    max_results: int = 20
+    max_results: int = 20,
+    position: str = "",
+    company: str = ""
 ) -> List[Dict]:
     """
     Main scraping function - dispatches to platform-specific scrapers.
@@ -289,6 +301,8 @@ def scrape_leads(
         location: Location/region (e.g., "Berlin, Germany")
         platform: Platform to scrape (linkedin, x, tiktok)
         max_results: Maximum number of results
+        position: Job title filter (LinkedIn only)
+        company: Company name filter (LinkedIn only)
 
     Returns:
         List of lead records
@@ -296,7 +310,7 @@ def scrape_leads(
     platform = platform.lower()
 
     if platform == "linkedin":
-        return scrape_linkedin(keyword, location, max_results)
+        return scrape_linkedin(keyword, location, max_results, position, company)
     elif platform in ["x", "twitter"]:
         return scrape_twitter(keyword, location, max_results)
     elif platform == "tiktok":
